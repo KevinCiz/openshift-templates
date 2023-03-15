@@ -22,44 +22,10 @@ metadata:
     samples.operator.openshift.io/version: 4.6.21
     tags: quickstart,php,cakephp
     template.openshift.io/bindable: "false"
-  creationTimestamp: "2021-04-07T18:19:06Z"
   labels:
     samples.operator.openshift.io/managed: "true"
-  managedFields:
-  - apiVersion: template.openshift.io/v1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:labels:
-        .: {}
-        f:app: {}
-        f:template: {}
-      f:message: {}
-      f:metadata:
-        f:annotations:
-          .: {}
-          f:description: {}
-          f:iconClass: {}
-          f:openshift.io/display-name: {}
-          f:openshift.io/documentation-url: {}
-          f:openshift.io/long-description: {}
-          f:openshift.io/provider-display-name: {}
-          f:openshift.io/support-url: {}
-          f:samples.operator.openshift.io/version: {}
-          f:tags: {}
-          f:template.openshift.io/bindable: {}
-        f:labels:
-          .: {}
-          f:samples.operator.openshift.io/managed: {}
-      f:objects: {}
-      f:parameters: {}
-    manager: cluster-samples-operator
-    operation: Update
-    time: "2021-04-07T18:19:06Z"
   name: cakephp-mysql-example
   namespace: openshift
-  resourceVersion: "14058"
-  selfLink: /apis/template.openshift.io/v1/namespaces/openshift/templates/cakephp-mysql-example
-  uid: 144f3a36-4417-417a-8ee1-5f37c647b66e
 objects:
 - apiVersion: v1
   kind: Secret

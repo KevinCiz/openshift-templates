@@ -1,0 +1,52 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: ${APP_NAME}
+objects:
+- kind: ImageStream
+  apiVersion: image.openshift.io/v1
+  metadata:
+    name: ${APP_NAME}
+    labels:
+      app: ${APP_NAME}
+  spec:
+    lookupPolicy:
+      local: false
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    name: ${APP_NAME}
+    labels:
+      app: ${APP_NAME}
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${APP_NAME}:latest
+    postCommit: {}
+    resources: {}
+    source:
+      git: 
+        uri: https://github.com/KevinCiz/DO288-apps
+        red: ${GITHUB_BRANCH}
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: nodejs:12
+          namespace: openshift
+      type: Source
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+parameters:
+  - name: APP_NAME
+    required: true
+    value: book-example
+  - name: GITHUB_BRANCH
+    required: true
+    value: main
+  
