@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  name: ${APP_NAME}
+  name: book-example
 objects:
 - kind: ImageStream
   apiVersion: image.openshift.io/v1
@@ -35,18 +35,100 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: nodejs:12
+          name: nodejs:16-ubi8
           namespace: openshift
       type: Source
     triggers:
     - type: ConfigChange
     - imageChange: {}
       type: ImageChange
+- kind: DeploymentConfig
+  apiVersion: apps.openshift.io/v1
+  metadata:
+    name: ${APP_NAME}
+    labels:
+      app: ${APP_NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${APP_NAME}
+      deploymentconfig: ${APP_NAME}
+    strategy:
+      resources: {}
+    template:
+      metadata:
+        labels:
+          app: ${APP_NAME}
+          deploymentconfig: ${APP_NAME}
+      spec:
+        containers:
+        - name: ${APP_NAME}
+          image: ${APP_NAME}:latest
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          resources:
+            limits:
+              cpu: 200m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APP_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${APP_NAME}:latest
+      type: ImageChange
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: ${APP_NAME}
+    labels:
+      app: ${APP_NAME}
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: ${APP_NAME}
+      deploymentconfig: ${APP_NAME}
+- kind: Route
+  apiVersion: route.openshift.io/v1
+  metadata:
+    name: ${APP_NAME}
+    labels:
+      app: ${APP_NAME}
+  spec:
+    host: ""
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: ${APP_NAME}
+      weight: 100
+    wildcardPolicy: None
 parameters:
-  - name: APP_NAME
-    required: true
-    value: book-example
-  - name: GITHUB_BRANCH
-    required: true
-    value: main
+- displayName: Application Name
+  name: APP_NAME
+  required: true
+  value: book-example
+- displayName: Branch Name
+  name: BRANCH_NAME
+  required: true
+  value: main
   
